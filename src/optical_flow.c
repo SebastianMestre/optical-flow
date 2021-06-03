@@ -9,14 +9,6 @@ static struct rgb at(struct bmp bmp, int x, int y) {
 	return bmp.data[bmp.width * y + x];
 }
 
-static struct rgb minus(struct rgb lhs, struct rgb rhs) {
-	return (struct rgb){
-		.r = lhs.r - rhs.r,
-		.g = lhs.g - rhs.g,
-		.b = lhs.b - rhs.b,
-	};
-}
-
 #define BOX_RADIUS 2
 #define BOX_SIZE (2*(BOX_RADIUS)+1)
 
