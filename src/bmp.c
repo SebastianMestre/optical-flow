@@ -8,15 +8,14 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdio.h>
 
 void bmp_write (
 	char const* fname,
-	uint8_t* red,
-	uint8_t* green,
-	uint8_t* blue,
-	int w, int h
+	struct bmp bmp
 ) {
+	uint32_t h = bmp.height;
+	uint32_t w = bmp.width;
+
 	FILE *f;
 	unsigned char *img = NULL;
 	int filesize = 54 + 3*w*h;  //w is your image width, h is image height, both int
@@ -30,9 +29,9 @@ void bmp_write (
 		{
 			int x=i;
 			int y=(h-1)-j;
-			uint8_t r = red[i*w+j]*255;
-			uint8_t g = green[i*w+j]*255;
-			uint8_t b = blue[i*w+j]*255;
+			uint8_t r = bmp.data[i*w+j].r*255;
+			uint8_t g = bmp.data[i*w+j].g*255;
+			uint8_t b = bmp.data[i*w+j].b*255;
 			if (r > 255) r=255;
 			if (g > 255) g=255;
 			if (b > 255) b=255;
@@ -72,19 +71,6 @@ void bmp_write (
 	free(img);
 	fclose(f);
 }
-
-struct rgb {
-	uint8_t r;
-	uint8_t g;
-	uint8_t b;
-};
-
-struct bmp {
-	uint32_t size;
-	uint32_t width;
-	uint32_t height;
-	struct rgb* data;
-};
 
 struct bmp bmp_read(FILE *f) {
 
