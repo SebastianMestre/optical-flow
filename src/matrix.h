@@ -1,6 +1,10 @@
 #include <stdlib.h>
 #include <assert.h>
 
+typedef size_t dimension;
+typedef size_t row;
+typedef size_t column;
+
 typedef struct {
 	const dimension dim;
 	double* scalars;
@@ -11,10 +15,6 @@ typedef struct {
 	const column cs;
 	double* scalars;
 } Matrix;
-
-typedef size_t dimension;
-typedef size_t row;
-typedef size_t column;
 
 Vector vector_make(dimension d) {
 	double* data = (double*)malloc(sizeof(double) * d);
