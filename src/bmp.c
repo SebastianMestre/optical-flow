@@ -104,7 +104,7 @@ struct bmp bmp_read(FILE *f) {
 			result_data[k++] = (struct rgb){
 				.r = data[q+2],
 				.g = data[q+1],
-				.b = data[q+1],
+				.b = data[q+0],
 			};
 			q += 3;
 		}
