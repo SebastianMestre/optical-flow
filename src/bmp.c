@@ -23,18 +23,13 @@ void bmp_write (
 	img = (unsigned char *)malloc(3*w*h);
 	memset(img,0,3*w*h);
 
-	for(int i=0; i<w; i++)
-	{
-		for(int j=0; j<h; j++)
-		{
-			int x=i;
-			int y=(h-1)-j;
-			uint8_t r = bmp.data[i*w+j].r*255;
-			uint8_t g = bmp.data[i*w+j].g*255;
-			uint8_t b = bmp.data[i*w+j].b*255;
-			if (r > 255) r=255;
-			if (g > 255) g=255;
-			if (b > 255) b=255;
+	for (int j=0; j<h; j++) {
+		for (int i=0; i<w; i++) {
+			int x = i;
+			int y = (h-1)-j;
+			uint8_t r = bmp.data[j*h+i].r;
+			uint8_t g = bmp.data[j*h+i].g;
+			uint8_t b = bmp.data[j*h+i].b;
 			img[(x+y*w)*3+2] = (unsigned char)(r);
 			img[(x+y*w)*3+1] = (unsigned char)(g);
 			img[(x+y*w)*3+0] = (unsigned char)(b);
@@ -50,14 +45,14 @@ void bmp_write (
 	bmpfileheader[ 4] = (unsigned char)(filesize>>16);
 	bmpfileheader[ 5] = (unsigned char)(filesize>>24);
 
-	bmpinfoheader[ 4] = (unsigned char)(       w    );
-	bmpinfoheader[ 5] = (unsigned char)(       w>> 8);
-	bmpinfoheader[ 6] = (unsigned char)(       w>>16);
-	bmpinfoheader[ 7] = (unsigned char)(       w>>24);
-	bmpinfoheader[ 8] = (unsigned char)(       h    );
-	bmpinfoheader[ 9] = (unsigned char)(       h>> 8);
-	bmpinfoheader[10] = (unsigned char)(       h>>16);
-	bmpinfoheader[11] = (unsigned char)(       h>>24);
+	bmpinfoheader[ 4] = (unsigned char)(w    );
+	bmpinfoheader[ 5] = (unsigned char)(w>> 8);
+	bmpinfoheader[ 6] = (unsigned char)(w>>16);
+	bmpinfoheader[ 7] = (unsigned char)(w>>24);
+	bmpinfoheader[ 8] = (unsigned char)(h    );
+	bmpinfoheader[ 9] = (unsigned char)(h>> 8);
+	bmpinfoheader[10] = (unsigned char)(h>>16);
+	bmpinfoheader[11] = (unsigned char)(h>>24);
 
 	f = fopen(fname,"wb");
 	fwrite(bmpfileheader,1,14,f);
@@ -107,10 +102,11 @@ struct bmp bmp_read(FILE *f) {
 	for (int i = 0; i < height; ++i) {
 		for (int j = 0; j < width; ++j) {
 			result_data[k++] = (struct rgb){
-				.r = data[q++],
-				.g = data[q++],
-				.b = data[q++],
+				.r = data[q+2],
+				.g = data[q+1],
+				.b = data[q+1],
 			};
+			q += 3;
 		}
 
 		// round up to multiple of 4
