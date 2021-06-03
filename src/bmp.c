@@ -72,3 +72,70 @@ void bmp_write (
 	free(img);
 	fclose(f);
 }
+
+struct rgb {
+	uint8_t r;
+	uint8_t g;
+	uint8_t b;
+};
+
+struct bmp {
+	uint32_t size;
+	uint32_t width;
+	uint32_t height;
+	struct rgb* data;
+};
+
+struct bmp bmp_read(FILE *f) {
+
+	unsigned char fileheader[14] = {};
+	unsigned char info[40] = {};
+
+	fread(fileheader,1,14,f);
+	fread(info,1,40,f);
+
+	uint32_t size = ((uint32_t)info[0] << 0) |
+	                ((uint32_t)info[1] << 8) |
+	                ((uint32_t)info[2] << 16) |
+	                ((uint32_t)info[3] << 24);
+
+	uint32_t width = ((uint32_t)info[4] << 0) |
+	                 ((uint32_t)info[5] << 8) |
+	                 ((uint32_t)info[6] << 16) |
+	                 ((uint32_t)info[7] << 24);
+
+	uint32_t height = ((uint32_t)info[8] << 0) |
+	                  ((uint32_t)info[9] << 8) |
+	                  ((uint32_t)info[10] << 16) |
+	                  ((uint32_t)info[11] << 24);
+
+	struct rgb* result_data = malloc(width * height * sizeof(struct rgb));
+
+	uint32_t data_size = size - 54; // file size minus header size
+	uint8_t* data = malloc(data_size);
+
+	fread(data, 1, data_size, f);
+
+	int k = 0;
+	int q = 0;
+	for (int i = 0; i < height; ++i) {
+		for (int j = 0; j < width; ++j) {
+			result_data[k++] = (struct rgb){
+				.r = data[q++],
+				.g = data[q++],
+				.b = data[q++],
+			};
+		}
+
+		// round up to multiple of 4
+		q = (q + (4-1)) & ~(4-1);
+	}
+
+	free(data);
+
+	return (struct bmp){
+		.width = width,
+		.height = height,
+		.data = result_data,
+	};
+}
