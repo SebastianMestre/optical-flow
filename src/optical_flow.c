@@ -4,7 +4,7 @@
 #include <assert.h>
 
 static double intensity(struct rgb rgb) {
-	return 0.299 * rgb.r + 0.587 * rgb.g + 0.114 * rgb.b;
+	return (0.299 / 255) * rgb.r + (0.587 / 255) * rgb.g + (0.114 / 255) * rgb.b;
 }
 
 static struct rgb at(struct bmp bmp, int x, int y) {
