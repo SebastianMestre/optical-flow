@@ -54,7 +54,18 @@ void optical_flow(struct bmp frame, struct bmp next_frame) {
 
 			Matrix Atb = matrix_product(At, b);
 
-			// solve(AtA * x = Atb);
+			// V -- optical flow vector (2 component)
+			Vector V = matrix_solve(AtA, as_vector_from_column(Atb));
+
+			// TODO: do something with V vector
+
+			vector_free(V);
+
+			matrix_free(Atb);
+			matrix_free(AtA);
+			matrix_free(At);
+			matrix_free(b);
+			matrix_free(A);
 		}
 	}
 }
