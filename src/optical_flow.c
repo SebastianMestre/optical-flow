@@ -34,9 +34,9 @@ void optical_flow(struct bmp bmp) {
 			int k = 0;
 			for (int ii = 0; ii < BOX_SIZE-1; ++ii) {
 				for(int jj = 0; jj < BOX_SIZE-1; ++jj) {
-					struct rgb pp = at(bmp, ii,   jj);
-					struct rgb px = at(bmp, ii+1, jj);
-					struct rgb py = at(bmp, ii,   jj+1);
+					struct rgb pp = at(bmp, i+ii,   j+jj);
+					struct rgb px = at(bmp, i+ii+1, j+jj);
+					struct rgb py = at(bmp, i+ii,   j+jj+1);
 
 					double const Ix = intensity(minus(px, pp));
 					double const Iy = intensity(minus(py, pp));
