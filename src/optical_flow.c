@@ -1,6 +1,8 @@
 #include "optical_flow.h"
 #include "matrix.h"
 
+#include <assert.h>
+
 static double intensity(struct rgb rgb) {
 	return 0.299 * rgb.r + 0.587 * rgb.g + 0.114 * rgb.b;
 }
@@ -12,9 +14,9 @@ static struct rgb at(struct bmp bmp, int x, int y) {
 #define BOX_RADIUS 2
 #define BOX_SIZE (2*(BOX_RADIUS)+1)
 
-void optical_flow(struct bmp bmp) {
-	uint32_t const width = bmp.width - BOX_SIZE;
-	uint32_t const height = bmp.height - BOX_SIZE;
+void optical_flow(struct bmp frame, struct bmp next_frame) {
+	assert(frame.width == next_frame.width);
+	assert(frame.height == next_frame.height);
 
 	uint32_t const equation_count = (BOX_SIZE - 1) * (BOX_SIZE - 1);
 
