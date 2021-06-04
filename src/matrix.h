@@ -205,7 +205,7 @@ Vector matrix_solve(Matrix m, Vector v) {
 		}
 
 		Vector row = vector_from(&m.scalars[r * m.cs], m.cs);
-		double sol = vector_get(v, r) - vector_inner_product(row, solution);
+		double sol = matrix_get(vm, r, 0) - vector_inner_product(row, solution);
 		vector_set(solution, c, sol);
 		r--;
 	}
