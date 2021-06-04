@@ -4,6 +4,12 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
+#define EPSILON (1e-6)
+
+bool is_zero(double x) {
+	return -EPSILON < x && x < EPSILON;
+}
+
 typedef size_t dimension;
 typedef size_t row;
 typedef size_t column;
@@ -136,11 +142,10 @@ void row_add_multiple(Matrix m, row i, row j, double s) {
 
 // NOTE: grabs the one that is lowest, for speed
 bool swap_for_pivot_row(Matrix m, row i, column j, Matrix v) {
-	// FIXME: epsilon comparison for doubles
-	if (matrix_get(m, i, j))
+	if (!is_zero(matrix_get(m, i, j)))
 		return true;
 	for (row pivot = m.rs - 1; pivot > i; pivot--) {
-		if (matrix_get(m, pivot, j)) {
+		if (!is_zero(matrix_get(m, pivot, j))) {
 			row_swap(m, i, pivot);
 			row_swap(v, i, pivot);
 			return true;
