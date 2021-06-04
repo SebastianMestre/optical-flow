@@ -21,7 +21,7 @@ void optical_flow(struct bmp frame, struct bmp next_frame) {
 	uint32_t const width = frame.width - BOX_SIZE;
 	uint32_t const height = frame.height - BOX_SIZE;
 
-	uint32_t const equation_count = (BOX_SIZE - 1) * (BOX_SIZE - 1);
+	uint32_t const equation_count = BOX_SIZE * BOX_SIZE;
 
 	for (int i = 0; i < height; ++i) {
 		for (int j = 0; j < width; ++j) {
@@ -30,8 +30,8 @@ void optical_flow(struct bmp frame, struct bmp next_frame) {
 			Matrix b = matrix_make(equation_count, 1);
 
 			int k = 0;
-			for (int ii = 0; ii < BOX_SIZE-1; ++ii) {
-				for(int jj = 0; jj < BOX_SIZE-1; ++jj) {
+			for (int ii = 0; ii < BOX_SIZE; ++ii) {
+				for(int jj = 0; jj < BOX_SIZE; ++jj) {
 					double const fp = intensity(at(frame,      i+ii,   j+jj));
 					double const fx = intensity(at(frame,      i+ii+1, j+jj));
 					double const fy = intensity(at(frame,      i+ii,   j+jj+1));
