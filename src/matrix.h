@@ -1,5 +1,8 @@
-#include <stdlib.h>
+#pragma once
+
 #include <assert.h>
+#include <stdlib.h>
+#include <stdbool.h>
 
 typedef size_t dimension;
 typedef size_t row;
