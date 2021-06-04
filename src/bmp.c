@@ -17,24 +17,8 @@ void bmp_write (
 	uint32_t w = bmp.width;
 
 	FILE *f;
-	unsigned char *img = NULL;
-	int filesize = 54 + 3*w*h;  //w is your image width, h is image height, both int
-
-	img = (unsigned char *)malloc(3*w*h);
-	memset(img,0,3*w*h);
-
-	for (int j=0; j<h; j++) {
-		for (int i=0; i<w; i++) {
-			int x = i;
-			int y = (h-1)-j;
-			uint8_t r = bmp.data[j*h+i].r;
-			uint8_t g = bmp.data[j*h+i].g;
-			uint8_t b = bmp.data[j*h+i].b;
-			img[(x+y*w)*3+2] = (unsigned char)(r);
-			img[(x+y*w)*3+1] = (unsigned char)(g);
-			img[(x+y*w)*3+0] = (unsigned char)(b);
-		}
-	}
+	int padding_per_row = w%4 ? 4-w%4 : 0;
+	int filesize = 54 + 3*w*h + padding_per_row * h;  //w is your image width, h is image height, both int
 
 	unsigned char bmpfileheader[14] = {'B','M', 0,0,0,0, 0,0, 0,0, 54,0,0,0};
 	unsigned char bmpinfoheader[40] = {40,0,0,0, 0,0,0,0, 0,0,0,0, 1,0, 24,0};
@@ -57,10 +41,30 @@ void bmp_write (
 	f = fopen(fname,"wb");
 	fwrite(bmpfileheader,1,14,f);
 	fwrite(bmpinfoheader,1,40,f);
-	for(int i=0; i<h; i++)
+
+	unsigned char *img = (unsigned char *)malloc(3*w*h);
+	memset(img,0,3*w*h);
+
+	for (int j=0; j<h; j++) {
+		for (int i=0; i<w; i++) {
+			int x = i;
+			int y = (h-1)-j;
+			uint8_t r = bmp.data[j*w+i].r;
+			uint8_t g = bmp.data[j*w+i].g;
+			uint8_t b = bmp.data[j*w+i].b;
+			img[(x+y*w)*3+2] = (unsigned char)(r);
+			img[(x+y*w)*3+1] = (unsigned char)(g);
+			img[(x+y*w)*3+0] = (unsigned char)(b);
+		}
+	}
+
+	for(int y = h; y--;)
 	{
-		fwrite(img+(w*(h-i-1)*3),3,w,f);
-		fwrite(bmppad,1,(4-(w*3)%4)%4,f);
+		fwrite(img+(w*y*3), 3, w, f);
+		if (w % 4 != 0) {
+			int extra = 4 - w%4;
+			fwrite(bmppad, 1, extra, f);
+		}
 	}
 
 	free(img);
@@ -75,10 +79,10 @@ struct bmp bmp_read(FILE *f) {
 	fread(fileheader,1,14,f);
 	fread(info,1,40,f);
 
-	uint32_t size = ((uint32_t)info[0] << 0) |
-	                ((uint32_t)info[1] << 8) |
-	                ((uint32_t)info[2] << 16) |
-	                ((uint32_t)info[3] << 24);
+	uint32_t size = ((uint32_t)fileheader[2] << 0) |
+	                ((uint32_t)fileheader[3] << 8) |
+	                ((uint32_t)fileheader[4] << 16) |
+	                ((uint32_t)fileheader[5] << 24);
 
 	uint32_t width = ((uint32_t)info[4] << 0) |
 	                 ((uint32_t)info[5] << 8) |
@@ -110,7 +114,9 @@ struct bmp bmp_read(FILE *f) {
 		}
 
 		// round up to multiple of 4
-		q = (q + (4-1)) & ~(4-1);
+		if (q % 4 != 0) {
+			q += 4 - q % 4;
+		}
 	}
 
 	free(data);
@@ -120,4 +126,11 @@ struct bmp bmp_read(FILE *f) {
 		.height = height,
 		.data = result_data,
 	};
+}
+
+struct bmp bmp_make(int width, int height) {
+	size_t data_size = width * height * sizeof(struct rgb);
+	struct rgb* data = malloc(data_size);
+	memset(data, 0, data_size);
+	return (struct bmp){ .width = width, .height = height, .data = data };
 }
