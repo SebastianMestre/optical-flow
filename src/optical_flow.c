@@ -16,7 +16,7 @@ static double clamp255(double x) {
 	return x < 0 ? 0 : (x > 255 ? 255 : x);
 }
 
-#define BOX_RADIUS 2
+#define BOX_RADIUS 8
 #define BOX_SIZE (2*(BOX_RADIUS)+1)
 
 struct bmp optical_flow(struct bmp frame, struct bmp next_frame) {
@@ -30,8 +30,8 @@ struct bmp optical_flow(struct bmp frame, struct bmp next_frame) {
 
 	uint32_t const equation_count = BOX_SIZE * BOX_SIZE;
 
-	for (int i = 0; i < height; ++i) {
-		for (int j = 0; j < width; ++j) {
+	for (int i = 0; i < width; ++i) {
+		for (int j = 0; j < height; ++j) {
 
 			Matrix A = matrix_make(equation_count, 2);
 			Matrix b = matrix_make(equation_count, 1);
@@ -39,6 +39,7 @@ struct bmp optical_flow(struct bmp frame, struct bmp next_frame) {
 			int k = 0;
 			for (int ii = 0; ii < BOX_SIZE; ++ii) {
 				for(int jj = 0; jj < BOX_SIZE; ++jj) {
+
 					double const fp = intensity(at(frame,      i+ii,   j+jj));
 					double const fx = intensity(at(frame,      i+ii+1, j+jj));
 					double const fy = intensity(at(frame,      i+ii,   j+jj+1));
@@ -68,12 +69,21 @@ struct bmp optical_flow(struct bmp frame, struct bmp next_frame) {
 			{
 				double Vx = vector_get(V, 0);
 				double Vy = vector_get(V, 1);
+				double Vlen = sqrt(Vx * Vx + Vy * Vy);
 
-				result.data[i * width + j] = (struct rgb){
-					.r = clamp255(127 + Vx * 127),
-					.g = clamp255(127 + Vy * 127),
-					.b = clamp255(sqrt(Vx * Vx + Vy * Vy) * 127),
+#if 0
+				result.data[j * width + i] = (struct rgb){
+					.r = clamp255(Vlen),
+					.g = clamp255(Vlen),
+					.b = clamp255(Vlen),
 				};
+#else
+				result.data[j * width + i] = (struct rgb){
+					.r = clamp255(127 + Vx),
+					.g = clamp255(127 + Vy),
+					.b = clamp255(Vlen),
+				};
+#endif
 			}
 
 			vector_free(V);
