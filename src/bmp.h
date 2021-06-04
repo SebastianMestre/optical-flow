@@ -14,3 +14,5 @@ struct bmp {
 void bmp_write (char const* fname, struct bmp);
 
 struct bmp bmp_read(FILE* f);
+
+struct bmp bmp_make(int width, int height);

@@ -121,3 +121,10 @@ struct bmp bmp_read(FILE *f) {
 		.data = result_data,
 	};
 }
+
+struct bmp bmp_make(int width, int height) {
+	size_t data_size = width * height * sizeof(struct rgb);
+	struct rgb* data = malloc(data_size);
+	memset(data, 0, data_size);
+	return (struct bmp){ .width = width, .height = height, .data = data };
+}
