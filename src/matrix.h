@@ -16,13 +16,13 @@ typedef size_t column;
 
 typedef struct {
 	const dimension dim;
-	double* scalars;
+	double* const scalars;
 } Vector;
 
 typedef struct {
 	const row rs;
 	const column cs;
-	double* scalars;
+	double* const scalars;
 } Matrix;
 
 Vector vector_make(dimension d) {
